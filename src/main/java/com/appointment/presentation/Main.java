@@ -1,4 +1,4 @@
-package com.appointment.presentation;
+/*package com.appointment.presentation;
 
 import com.appointment.domain.Schedule;
 import com.appointment.domain.TimeSlot;
@@ -37,4 +37,4 @@ public class Main {
 
         authService.logout();
     }
-}
+}*/
