@@ -9,6 +9,9 @@ public class Appointment {
     private int participants;
     private AppointmentStatus status;
 
+    private TimeSlot timeSlot;
+    private User user;
+
     public Appointment(LocalDateTime start, LocalDateTime end, int participants) {
         this.start = start;
         this.end = end;
@@ -34,5 +37,27 @@ public class Appointment {
 
     public void confirm() {
         this.status = AppointmentStatus.CONFIRMED;
+    }
+
+
+    public boolean isFuture() {
+        return start.isAfter(LocalDateTime.now());
+    }
+
+    
+    public TimeSlot getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(TimeSlot timeSlot) {
+        this.timeSlot = timeSlot;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
