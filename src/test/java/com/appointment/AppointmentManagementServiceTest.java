@@ -2,6 +2,8 @@ package com.appointment;
 
 import com.appointment.domain.*;
 import com.appointment.service.AppointmentManagementService;
+import com.appointment.exception.InvalidAppointmentException;
+import com.appointment.exception.UnauthorizedActionException;
 
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +69,7 @@ public class AppointmentManagementServiceTest {
         AppointmentManagementService service =
                 new AppointmentManagementService();
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(InvalidAppointmentException.class, () -> {
             service.modifyAppointment(app, newSlot, user);
         });
     }
@@ -100,7 +102,7 @@ public class AppointmentManagementServiceTest {
         AppointmentManagementService service =
                 new AppointmentManagementService();
 
-        assertThrows(SecurityException.class, () -> {
+        assertThrows(UnauthorizedActionException.class, () -> {
             service.modifyAppointment(app, newSlot, other);
         });
     }
@@ -150,7 +152,7 @@ public class AppointmentManagementServiceTest {
         AppointmentManagementService service =
                 new AppointmentManagementService();
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(InvalidAppointmentException.class, () -> {
             service.cancelAppointment(app, user);
         });
     }

@@ -11,7 +11,7 @@ public class Appointment {
 
     private TimeSlot timeSlot;
     private User user;
-
+    private AppointmentType type;
     public Appointment(LocalDateTime start, LocalDateTime end, int participants) {
         this.start = start;
         this.end = end;
@@ -59,5 +59,12 @@ public class Appointment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    public AppointmentType getType() {
+        return type;
+    }
+
+    public void setType(AppointmentType type) {
+        this.type = type;
     }
 }

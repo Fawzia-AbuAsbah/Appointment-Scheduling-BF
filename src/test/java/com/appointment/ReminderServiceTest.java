@@ -25,8 +25,12 @@ public class ReminderServiceTest {
                 2
         );
 
-        service.sendReminder("Fawzia.y123456@gmail.com", appointment);
+        service.sendReminder("test@gmail.com", appointment);
 
+        
         assertEquals(1, mock.getSentMessages().size());
+
+        
+        assertTrue(mock.getSentMessages().get(0).contains("Reminder"));
     }
 }
