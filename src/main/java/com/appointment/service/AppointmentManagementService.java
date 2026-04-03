@@ -8,10 +8,14 @@ import com.appointment.exception.UnauthorizedActionException;
 
 public class AppointmentManagementService {
 
-    // Edit appointment
+    // MODIFY
     public void modifyAppointment(Appointment appointment,
                                   TimeSlot newSlot,
                                   User user) {
+
+        if (appointment == null || newSlot == null) {
+            throw new InvalidAppointmentException("Invalid data");
+        }
 
         if (!appointment.isFuture()) {
             throw new InvalidAppointmentException("Cannot modify past appointment");
@@ -21,13 +25,20 @@ public class AppointmentManagementService {
             throw new UnauthorizedActionException("Unauthorized");
         }
 
+        if (appointment.getTimeSlot() == null) {
+            throw new InvalidAppointmentException("No slot assigned");
+        }
+
+        // فك القديم
         appointment.getTimeSlot().setBooked(false);
+
+        // حجز الجديد
         newSlot.setBooked(true);
 
         appointment.setTimeSlot(newSlot);
     }
 
-    // Cancel by user
+    // CANCEL USER
     public void cancelAppointment(Appointment appointment, User user) {
 
         if (!appointment.isFuture()) {
@@ -41,9 +52,11 @@ public class AppointmentManagementService {
         appointment.getTimeSlot().setBooked(false);
     }
 
-    // Cancel by admin
+    // CANCEL ADMIN
     public void cancelAsAdmin(Appointment appointment) {
 
-        appointment.getTimeSlot().setBooked(false);
+        if (appointment.getTimeSlot() != null) {
+            appointment.getTimeSlot().setBooked(false);
+        }
     }
 }
