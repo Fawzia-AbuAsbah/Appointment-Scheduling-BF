@@ -68,7 +68,7 @@ public class Appointment {
         this.type = type;
     }
     
- // ================= VALIDATION =================
+ 
 
  // Duration Rule
  public void validateDuration() {
