@@ -16,13 +16,13 @@ public class TimeSlot {
         this.end = end;
         this.booked = false;
     }
+    
+    public void setBooked(boolean booked) {
+        this.booked = booked;
+    }
 
     public boolean isBooked() {
         return booked;
-    }
-
-    public void setBooked(boolean booked) {
-        this.booked = booked;
     }
 
     public LocalDateTime getStart() {

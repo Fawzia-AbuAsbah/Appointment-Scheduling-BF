@@ -20,7 +20,7 @@ public class BookingServiceTest {
         Appointment appointment =
                 new Appointment(
                         LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(2),
+                        LocalDateTime.now().plusHours(1),
                         3
                 );
 
