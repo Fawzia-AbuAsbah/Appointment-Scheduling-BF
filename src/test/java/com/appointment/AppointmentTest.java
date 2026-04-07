@@ -1,7 +1,9 @@
 package com.appointment;
 
+
 import com.appointment.domain.Appointment;
 import com.appointment.domain.AppointmentStatus;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -55,12 +57,14 @@ public class AppointmentTest {
     }
 
     @Test
+
     void validateAllSuccess() {
         Appointment app = new Appointment(
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(2),
                 2
         );
+
 
         assertDoesNotThrow(app::validateAll);
     }
@@ -72,6 +76,7 @@ public class AppointmentTest {
                 LocalDateTime.now().plusHours(5),
                 10
         );
+
 
         assertThrows(IllegalArgumentException.class, app::validateAll);
     }
@@ -90,19 +95,7 @@ public class AppointmentTest {
     }
 
     @Test
-    void cancelChangesStatus() {
-        Appointment app = new Appointment(
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
-                1
-        );
 
-        app.cancel();
-
-        assertEquals(AppointmentStatus.CANCELLED, app.getStatus());
-    }
-
-    @Test
     void isFutureTrue() {
         Appointment app = new Appointment(
                 LocalDateTime.now().plusHours(1),

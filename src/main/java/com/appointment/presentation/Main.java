@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
-
+ 
         List<User> users = new ArrayList<>();
         users.add(new User("balsam", "123"));
         users.add(new User("fawzia.y123456", "456"));
