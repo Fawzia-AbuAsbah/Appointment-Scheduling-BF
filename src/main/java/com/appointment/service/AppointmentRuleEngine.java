@@ -5,7 +5,18 @@ import com.appointment.strategy.AppointmentRuleStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Rule engine used to validate appointments against a set of business rules.
+ * 
+ * <p>This class applies the Strategy design pattern, where each validation
+ * rule is represented by an implementation of {@code AppointmentRuleStrategy}.
+ * All added strategies are executed in sequence.</p>
+ * 
+ * <p>If any strategy fails, validation stops and the appointment is considered invalid.</p>
+ * 
+ * @author Team
+ * @version 1.0
+ */
 public class AppointmentRuleEngine {
 
     private List<AppointmentRuleStrategy> strategies = new ArrayList<>();

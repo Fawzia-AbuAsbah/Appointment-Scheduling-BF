@@ -8,6 +8,10 @@ public class TypeBasedRuleStrategy implements AppointmentRuleStrategy {
     @Override
     public boolean isValid(Appointment appointment) {
 
+        if (appointment == null || appointment.getType() == null) {
+            return false;
+        }
+
         if (appointment.getType() == AppointmentType.GROUP) {
             return appointment.getParticipants() >= 2;
         }

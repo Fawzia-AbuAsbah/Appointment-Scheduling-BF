@@ -3,7 +3,10 @@
 import com.appointment.domain.*;
 import com.appointment.notification.*;
 import com.appointment.service.*;
-
+import com.appointment.repo.AppointmentRepo;
+import com.appointment.strategy.TypeBasedRuleStrategy;
+import com.appointment.service.AppointmentRuleEngine;
+import com.appointment.service.BookingService;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -40,12 +43,23 @@ public class Main {
 
         List<Appointment> appointments = new ArrayList<>();
 
+        
+        AppointmentRepo repo = new AppointmentRepo();
+
+        AppointmentRuleEngine engine = new AppointmentRuleEngine();
+        engine.addStrategy(new TypeBasedRuleStrategy());
+
+        BookingService bookingService = new BookingService(repo, engine);
+
+       
         NotificationService notification =
                 new EmailNotificationService(
                         new EmailService("s12217816@stu.najah.edu", "xdhl usqv exvz eukl")
                 );
 
         ReminderService reminderService = new ReminderService(notification);
+
+
 
         while (true) {
 
@@ -98,7 +112,7 @@ public class Main {
                         Appointment app = appointments.get(i);
 
                         managementService.cancelAsAdmin(app);
-                        appointments.remove(i); // 🔥 مهم
+                        appointments.remove(i); 
 
                         
                         notification.sendNotification(
@@ -117,9 +131,6 @@ public class Main {
 
                         Appointment app = appointments.get(i);
 
-                        // 🔥 حرر القديم
-                        app.getTimeSlot().setBooked(false);
-
                         List<TimeSlot> available = scheduleService.viewAvailableSlots();
 
                         for (int j = 0; j < available.size(); j++) {
@@ -129,14 +140,14 @@ public class Main {
                         System.out.print("New slot: ");
                         TimeSlot newSlot = available.get(input.nextInt());
 
-                        // 🔥 admin bypass (نفس اليوزر)
+                        // admin bypass 
                         managementService.modifyAppointment(
                                 app,
                                 newSlot,
                                 app.getUser()
                         );
 
-                        // 🔥 EMAIL لليوزر
+                        //  EMAIL 
                         notification.sendNotification(
                         	    app.getUser().getUsername() + "@gmail.com",
                         	    "Your appointment has been updated to: "
@@ -213,16 +224,14 @@ public class Main {
                         }
 
                         app.setType(types[input.nextInt()]);
+                        boolean booked = bookingService.book(app);
 
-                        try {
-                            app.validateAll();
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
+                        if (!booked) {
+                            System.out.println("❌ Booking failed بسبب مخالفة أحد الشروط");
                             continue;
                         }
 
                         chosen.setBooked(true);
-                        app.confirm();
                         appointments.add(app);
 
                         reminderService.sendReminder(
@@ -233,7 +242,7 @@ public class Main {
                         System.out.println("✅ Booked + Email Sent!");
                     }
 
-                    // MODIFY 🔥
+                    // MODIFY 
                     else if (c == 3) {
 
                         System.out.print("Index: ");
@@ -255,7 +264,7 @@ public class Main {
                         System.out.println("✅ Modified");
                     }
 
-                    // CANCEL 🔥
+                    // CANCEL 
                     else if (c == 4) {
 
                         System.out.print("Index: ");
@@ -264,12 +273,12 @@ public class Main {
                         Appointment app = appointments.get(i);
 
                         managementService.cancelAppointment(app, user);
-                        appointments.remove(i); // 🔥 مهم
+                        appointments.remove(i); 
 
                         System.out.println("✅ Cancelled");
                     }
 
-                    // MY APPOINTMENTS 🔥 (مهم جداً)
+                    // MY APPOINTMENTS 
                     else if (c == 5) {
 
                         for (int i = 0; i < appointments.size(); i++) {

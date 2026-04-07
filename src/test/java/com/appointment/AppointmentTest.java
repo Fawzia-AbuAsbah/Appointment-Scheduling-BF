@@ -1,6 +1,7 @@
 package com.appointment;
 
-import com.appointment.domain.*;
+import com.appointment.domain.Appointment;
+import com.appointment.domain.AppointmentStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -54,40 +55,12 @@ public class AppointmentTest {
     }
 
     @Test
-    void validateTypeSuccess() {
-        Appointment app = new Appointment(
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
-                2
-        );
-
-        app.setType(AppointmentType.GROUP);
-
-        assertDoesNotThrow(app::validateType);
-    }
-
-    @Test
-    void validateTypeFail() {
-        Appointment app = new Appointment(
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
-                1
-        );
-
-        app.setType(AppointmentType.GROUP);
-
-        assertThrows(IllegalArgumentException.class, app::validateType);
-    }
-
-    @Test
     void validateAllSuccess() {
         Appointment app = new Appointment(
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(2),
                 2
         );
-
-        app.setType(AppointmentType.INDIVIDUAL);
 
         assertDoesNotThrow(app::validateAll);
     }
@@ -99,8 +72,6 @@ public class AppointmentTest {
                 LocalDateTime.now().plusHours(5),
                 10
         );
-
-        app.setType(AppointmentType.GROUP);
 
         assertThrows(IllegalArgumentException.class, app::validateAll);
     }
@@ -116,6 +87,19 @@ public class AppointmentTest {
         app.confirm();
 
         assertEquals(AppointmentStatus.CONFIRMED, app.getStatus());
+    }
+
+    @Test
+    void cancelChangesStatus() {
+        Appointment app = new Appointment(
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2),
+                1
+        );
+
+        app.cancel();
+
+        assertEquals(AppointmentStatus.CANCELLED, app.getStatus());
     }
 
     @Test

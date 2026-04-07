@@ -38,7 +38,10 @@ public class Appointment {
     public void confirm() {
         this.status = AppointmentStatus.CONFIRMED;
     }
-
+     
+    public void cancel() {
+        this.status = AppointmentStatus.CANCELLED;
+    }
 
     public boolean isFuture() {
         return start.isAfter(LocalDateTime.now());
@@ -70,7 +73,7 @@ public class Appointment {
     
  
 
- // Duration Rule
+ 
  public void validateDuration() {
      long hours = java.time.Duration.between(start, end).toHours();
 
@@ -79,26 +82,17 @@ public class Appointment {
      }
  }
 
- // Participants Rule
+
  public void validateParticipants() {
      if (participants > 5) {
          throw new IllegalArgumentException("❌ Max participants is 5");
      }
  }
 
- // Type Rule (Sprint 5 🔥)
- public void validateType() {
-     if (type == AppointmentType.GROUP && participants < 2) {
-         throw new IllegalArgumentException("❌ Group appointment needs at least 2 participants");
-     }
- }
  
  
-
  public void validateAll() {
-	  validateDuration();
+	    validateDuration();
 	    validateParticipants();
-	    validateType();
-	
- }
+	}
 }
