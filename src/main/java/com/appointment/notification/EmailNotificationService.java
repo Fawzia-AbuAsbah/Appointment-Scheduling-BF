@@ -1,4 +1,4 @@
-/*package com.appointment.notification;
+package com.appointment.notification;
 
 public class EmailNotificationService implements NotificationService {
 
@@ -15,4 +15,4 @@ public class EmailNotificationService implements NotificationService {
 
         emailService.sendEmail(to, subject, message);
     }
-}*/
+}

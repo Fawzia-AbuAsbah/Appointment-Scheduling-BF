@@ -1,4 +1,4 @@
-/*package com.appointment.notification;
+package com.appointment.notification;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
@@ -50,5 +50,5 @@ public class EmailService {
         }
     }
 
-}*/
+}
 

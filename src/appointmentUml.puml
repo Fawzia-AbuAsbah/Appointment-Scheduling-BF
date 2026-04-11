@@ -1,0 +1,200 @@
+@startuml
+
+class com.appointment.service.ScheduleService {
+  - Schedule schedule
+  + List<TimeSlot> viewAvailableSlots()
+}
+
+class com.appointment.service.AppointmentRuleEngine {
+  - List<AppointmentRuleStrategy> strategies
+  + void addStrategy(AppointmentRuleStrategy)
+  + boolean validate(Appointment)
+}
+
+class com.appointment.repo.AdminRepo {
+  - List<Administrator> admins
+  + Optional<Administrator> findByUsername(String)
+}
+
+class com.appointment.service.BookingService {
+  - {static} int MAX_PARTICIPANTS
+  - {static} int MAX_DURATION_HOURS
+  - AppointmentRepo repo
+  - AppointmentRuleEngine ruleEngine
+  + boolean book(Appointment)
+}
+
+class com.appointment.exception.InvalidAppointmentException {
+}
+
+class com.appointment.domain.User {
+  # String username
+  # String password
+  + String getUsername()
+  + String getPassword()
+}
+
+class com.appointment.repo.AppointmentRepo {
+  - List<Appointment> appointments
+  + void save(Appointment)
+  + List<Appointment> findAll()
+}
+
+class com.appointment.domain.Administrator {
+}
+
+class com.appointment.strategy.TypeBasedRuleStrategy {
+  + boolean isValid(Appointment)
+}
+
+class com.appointment.exception.UnauthorizedActionException {
+}
+
+enum com.appointment.domain.AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+class com.appointment.domain.TimeSlot {
+  - LocalDateTime start
+  - LocalDateTime end
+  - boolean booked
+  + void setBooked(boolean)
+  + boolean isBooked()
+  + LocalDateTime getStart()
+  + LocalDateTime getEnd()
+}
+
+class com.appointment.notification.MockNotificationService {
+  - List<String> sentMessages
+  + void sendNotification(String, String)
+  + List<String> getSentMessages()
+}
+
+class com.appointment.strategy.DurationRuleStrategy {
+  + boolean isValid(Appointment)
+}
+
+enum com.appointment.domain.AppointmentType {
+  URGENT
+  FOLLOW_UP
+  ASSESSMENT
+  VIRTUAL
+  IN_PERSON
+  INDIVIDUAL
+  GROUP
+}
+
+interface com.appointment.strategy.AppointmentRuleStrategy {
+  + boolean isValid(Appointment)
+}
+
+class com.appointment.service.ReminderService {
+  - NotificationService notificationService
+  + void sendReminder(String, Appointment)
+}
+
+class com.appointment.domain.Appointment {
+  - LocalDateTime start
+  - LocalDateTime end
+  - int participants
+  - AppointmentStatus status
+  - TimeSlot timeSlot
+  - User user
+  - AppointmentType type
+  + LocalDateTime getStart()
+  + LocalDateTime getEnd()
+  + int getParticipants()
+  + AppointmentStatus getStatus()
+  + void confirm()
+  + void cancel()
+  + boolean isFuture()
+  + TimeSlot getTimeSlot()
+  + void setTimeSlot(TimeSlot)
+  + User getUser()
+  + void setUser(User)
+  + AppointmentType getType()
+  + void setType(AppointmentType)
+  + void validateDuration()
+  + void validateParticipants()
+  + void validateAll()
+}
+
+class com.appointment.service.AuthenticationService {
+  - AdminRepo repository
+  - Administrator loggedAdmin
+  + boolean login(String, String)
+  + void logout()
+  + boolean isLoggedIn()
+}
+
+class com.appointment.domain.Schedule {
+  - List<TimeSlot> slots
+  + void addSlot(TimeSlot)
+  + List<TimeSlot> getAvailableSlots()
+}
+
+class com.appointment.strategy.ParticipantRuleStrategy {
+  + boolean isValid(Appointment)
+}
+
+class com.appointment.service.AppointmentManagementService {
+  + void modifyAppointment(Appointment, TimeSlot, User)
+  + void cancelAppointment(Appointment, User)
+  + void cancelAsAdmin(Appointment)
+}
+
+interface com.appointment.notification.NotificationService {
+  + void sendNotification(String, String)
+}
+
+class com.appointment.notification.EmailNotificationService {
+  - EmailService emailService
+  + void sendNotification(String, String)
+}
+
+class com.appointment.notification.EmailService {
+  - String senderEmail
+  - String appPassword
+  + void sendEmail(String, String)
+}
+
+' ===== RELATIONSHIPS =====
+
+com.appointment.domain.User <|-- com.appointment.domain.Administrator
+
+com.appointment.strategy.AppointmentRuleStrategy <|.. com.appointment.strategy.TypeBasedRuleStrategy
+com.appointment.strategy.AppointmentRuleStrategy <|.. com.appointment.strategy.DurationRuleStrategy
+com.appointment.strategy.AppointmentRuleStrategy <|.. com.appointment.strategy.ParticipantRuleStrategy
+
+com.appointment.notification.NotificationService <|.. com.appointment.notification.MockNotificationService
+com.appointment.notification.NotificationService <|.. com.appointment.notification.EmailNotificationService
+
+com.appointment.domain.Schedule *-- com.appointment.domain.TimeSlot
+com.appointment.domain.Appointment --> com.appointment.domain.User
+com.appointment.domain.Appointment --> com.appointment.domain.TimeSlot
+com.appointment.domain.Appointment --> com.appointment.domain.AppointmentStatus
+com.appointment.domain.Appointment --> com.appointment.domain.AppointmentType
+
+com.appointment.service.ScheduleService --> com.appointment.domain.Schedule
+com.appointment.service.BookingService --> com.appointment.repo.AppointmentRepo
+com.appointment.service.BookingService --> com.appointment.service.AppointmentRuleEngine
+com.appointment.service.BookingService --> com.appointment.domain.Appointment
+
+com.appointment.service.AppointmentRuleEngine --> com.appointment.strategy.AppointmentRuleStrategy
+
+com.appointment.service.ReminderService --> com.appointment.notification.NotificationService
+com.appointment.service.ReminderService --> com.appointment.domain.Appointment
+
+com.appointment.service.AppointmentManagementService --> com.appointment.domain.Appointment
+com.appointment.service.AppointmentManagementService --> com.appointment.domain.TimeSlot
+com.appointment.service.AppointmentManagementService --> com.appointment.domain.User
+
+com.appointment.service.AuthenticationService --> com.appointment.repo.AdminRepo
+com.appointment.repo.AdminRepo --> com.appointment.domain.Administrator
+com.appointment.repo.AppointmentRepo --> com.appointment.domain.Appointment
+
+com.appointment.notification.EmailNotificationService --> com.appointment.notification.EmailService
+
+@enduml

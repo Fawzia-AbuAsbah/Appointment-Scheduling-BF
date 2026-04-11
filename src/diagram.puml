@@ -1,0 +1,28 @@
+@startuml
+
+class Appointment
+class User
+class Administrator
+class TimeSlot
+class Schedule
+class BookingService
+class AppointmentManagementService
+class AppointmentRuleEngine
+class TypeBasedRuleStrategy
+class NotificationService
+class EmailNotificationService
+class ReminderService
+class AppointmentRepo
+
+Schedule *-- TimeSlot
+Appointment --> User
+Appointment --> TimeSlot
+
+TypeBasedRuleStrategy --|> AppointmentRuleStrategy
+EmailNotificationService --|> NotificationService
+
+BookingService --> AppointmentRuleEngine
+ReminderService --> NotificationService
+AppointmentManagementService --> Appointment
+
+@enduml
