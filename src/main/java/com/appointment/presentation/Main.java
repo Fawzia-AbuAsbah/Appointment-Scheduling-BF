@@ -30,7 +30,7 @@ public class Main {
         Scanner input = new Scanner(System.in);
 
         List<User> users = new ArrayList<>();
-        users.add(new User("balsam", "123"));
+        users.add(new User("balsamadnanmashaqi", "123"));
         users.add(new User("fawzia.y123456", "456"));
 
         List<User> admins = new ArrayList<>();
@@ -95,7 +95,8 @@ public class Main {
                     System.out.println("3. Modify Appointment");
                     System.out.println("4. Add Slots");
                     System.out.println("5. View Calendar");
-                    System.out.println("6. Back");
+                    System.out.println("6. Send Reminders To All Users");
+                    System.out.println("7. Back");
                     System.out.print("Choice: ");
 
                     int c = readInt(input);
@@ -259,6 +260,27 @@ public class Main {
                     }
 
                     else if (c == 6) {
+                        if (appointments.isEmpty()) {
+                            System.out.println("No appointments found.");
+                            continue;
+                        }
+
+                        int sentCount = 0;
+
+                        for (Appointment appointment : appointments) {
+                            if (appointment.getEnd().isAfter(LocalDateTime.now())) {
+                                reminderService.sendReminder(
+                                        appointment.getUser().getUsername() + "@gmail.com",
+                                        appointment
+                                );
+                                sentCount++;
+                            }
+                        }
+
+                        System.out.println("✅ Reminders sent to " + sentCount + " users.");
+                    }
+
+                    else if (c == 7) {
                         break;
                     }
                 }
