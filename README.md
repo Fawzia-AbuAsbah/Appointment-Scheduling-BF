@@ -52,8 +52,13 @@ strategy → rule validation using Strategy Pattern
 notification → email services
 presentation → CLI interface (Main)
 
-#Testing
-
+# Testing
+The project uses:
+- JUnit 5 for unit testing
+- Mockito for mocking
+- JaCoCo for code coverage analysis
+- SonarCloud for static code analysis
+- GitHub Actions for CI/CD automation
 The system includes unit tests using JUnit 5.
 
 Tested components:
@@ -67,7 +72,13 @@ Mocking is used in testing notification services.
 
 # Test Coverage
 
-The project achieves more than 80% test coverage.
+The project achieves more than 80% code coverage using JaCoCo and SonarCloud.
+
+# Quality Assurance
+- Static code analysis was performed using SonarCloud.
+- Code smells and maintainability issues were reviewed and refactored.
+- Continuous Integration was configured using GitHub Actions.
+- Javadoc documentation was generated for the project.
 
 # How to Run
 Run the application
@@ -79,7 +90,7 @@ Run tests
 If using Maven:
 mvn clean test
 
-#Notifications
+# Notifications
 
 The system uses an email service to send:
 
@@ -87,7 +98,10 @@ Booking confirmations
 Cancellation notifications
 Reminder messages
 
-#Submission Notes
+# Submission Notes
 This project is submitted as a group work.
 All members are listed above.
 The full source code is available in this repository.
+# Documentation
+- UML Diagram included
+- Javadoc documentation available in docs/apidocs
