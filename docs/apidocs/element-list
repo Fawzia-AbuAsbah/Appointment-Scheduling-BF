@@ -1,0 +1,7 @@
+com.appointment.domain
+com.appointment.exception
+com.appointment.notification
+com.appointment.presentation
+com.appointment.repo
+com.appointment.service
+com.appointment.strategy
