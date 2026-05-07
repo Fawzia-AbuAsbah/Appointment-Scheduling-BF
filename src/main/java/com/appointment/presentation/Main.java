@@ -33,40 +33,44 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Scanner input = new Scanner(System.in);
+    	Scanner input = new Scanner(System.in);
 
-        List<User> users = createUsers();
-        List<User> admins = createAdmins();
+    	List<User> users = createUsers();
+    	List<User> admins = createAdmins();
 
-        Schedule schedule = new Schedule();
-        List<TimeSlot> allSlots = new ArrayList<>();
-        List<Appointment> appointments = new ArrayList<>();
+    	Schedule schedule = new Schedule();
+    	List<TimeSlot> allSlots = new ArrayList<>();
+    	List<Appointment> appointments = new ArrayList<>();
 
-        ensureWeeklyCalendar(schedule, allSlots);
+    	ensureWeeklyCalendar(schedule, allSlots);
 
-        AppointmentRepo repo = new AppointmentRepo();
-        AppointmentRuleEngine engine = new AppointmentRuleEngine();
-        engine.addStrategy(new TypeBasedRuleStrategy());
-        BookingService bookingService = new BookingService(repo, engine);
+    	AppointmentRepo repo = new AppointmentRepo();
 
-        NotificationService notification =
-                new EmailNotificationService(
-                        new EmailService("s12217816@stu.najah.edu", "xdhl usqv exvz eukl")
-                );
+    	AppointmentRuleEngine engine = new AppointmentRuleEngine();
+    	engine.addStrategy(new TypeBasedRuleStrategy());
 
-        ReminderService reminderService = new ReminderService(notification);
+    	BookingService bookingService = new BookingService(repo, engine);
 
-        runMainMenu(
-                input,
-                users,
-                admins,
-                schedule,
-                allSlots,
-                appointments,
-                bookingService,
-                notification,
-                reminderService
-        );
+    	NotificationService notification =
+    	        new EmailNotificationService(
+    	                new EmailService("s12217816@stu.najah.edu", "xdhl usqv exvz eukl")
+    	        );
+
+    	ReminderService reminderService = new ReminderService(notification);
+
+    	AppContext ctx = new AppContext(
+    	        input,
+    	        schedule,
+    	        allSlots,
+    	        appointments,
+    	        bookingService,
+    	        notification,
+    	        reminderService,
+    	        users,
+    	        admins
+    	);
+
+    	runMainMenu(ctx);
     }
 
     private static List<User> createUsers() {
@@ -82,44 +86,17 @@ public class Main {
         return admins;
     }
 
-    private static void runMainMenu(
-            Scanner input,
-            List<User> users,
-            List<User> admins,
-            Schedule schedule,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            NotificationService notification,
-            ReminderService reminderService
-    ) {
+    private static void runMainMenu(AppContext ctx) {
         while (true) {
-            refreshData(schedule, allSlots, appointments);
+            refreshData(ctx.schedule, ctx.allSlots, ctx.appointments);
 
             printMainMenu();
-            int mainChoice = readInt(input);
+            int mainChoice = readInt(ctx.input);
 
             if (mainChoice == 1) {
-                handleAdminLogin(
-                        input,
-                        admins,
-                        schedule,
-                        allSlots,
-                        appointments,
-                        bookingService,
-                        notification,
-                        reminderService
-                );
+                handleAdminLogin(ctx);
             } else if (mainChoice == 2) {
-                handleUserLogin(
-                        input,
-                        users,
-                        schedule,
-                        allSlots,
-                        appointments,
-                        bookingService,
-                        reminderService
-                );
+                handleUserLogin(ctx);
             } else if (mainChoice == 3) {
                 System.out.println("👋 Bye");
                 break;
@@ -135,36 +112,19 @@ public class Main {
         System.out.print(CHOICE_PROMPT);
     }
 
-    private static void handleAdminLogin(
-            Scanner input,
-            List<User> admins,
-            Schedule schedule,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            NotificationService notification,
-            ReminderService reminderService
-    ) {
+    private static void handleAdminLogin(AppContext ctx) {
         System.out.print("Username: ");
-        String username = input.next();
+        String username = ctx.input.next();
 
         System.out.print("Password: ");
-        String password = input.next();
+        String password = ctx.input.next();
 
-        if (!isValidLogin(admins, username, password)) {
+        if (!isValidLogin(ctx.admins, username, password)) {
             System.out.println("❌ Wrong admin login");
             return;
         }
 
-        handleAdminMenu(
-                input,
-                schedule,
-                allSlots,
-                appointments,
-                bookingService,
-                notification,
-                reminderService
-        );
+        handleAdminMenu(ctx);
     }
 
     private static boolean isValidLogin(List<User> users, String username, String password) {
@@ -173,33 +133,25 @@ public class Main {
                         && user.getPassword().equals(password));
     }
 
-    private static void handleAdminMenu(
-            Scanner input,
-            Schedule schedule,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            NotificationService notification,
-            ReminderService reminderService
-    ) {
+    private static void handleAdminMenu(AppContext ctx) {
         while (true) {
-            refreshData(schedule, allSlots, appointments);
+            refreshData(ctx.schedule, ctx.allSlots, ctx.appointments);
 
             printAdminMenu();
-            int choice = readInt(input);
+            int choice = readInt(ctx.input);
 
             if (choice == 1) {
-                viewAllAppointments(appointments);
+                viewAllAppointments(ctx.appointments);
             } else if (choice == 2) {
-                adminCancelAppointment(input, allSlots, appointments, notification);
+                adminCancelAppointment(ctx);
             } else if (choice == 3) {
-                adminModifyAppointment(input, allSlots, appointments, bookingService, notification);
+                adminModifyAppointment(ctx);
             } else if (choice == 4) {
-                addSlotsByAdmin(input, schedule, allSlots);
+                addSlotsByAdmin(ctx.input, ctx.schedule, ctx.allSlots);
             } else if (choice == 5) {
-                printCalendar(allSlots);
+                printCalendar(ctx.allSlots);
             } else if (choice == 6) {
-                sendRemindersToAllUsers(appointments, reminderService);
+                sendRemindersToAllUsers(ctx.appointments, ctx.reminderService);
             } else if (choice == 7) {
                 break;
             }
@@ -235,32 +187,27 @@ public class Main {
         }
     }
 
-    private static void adminCancelAppointment(
-            Scanner input,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            NotificationService notification
-    ) {
-        if (appointments.isEmpty()) {
+    private static void adminCancelAppointment(AppContext ctx) {
+        if (ctx.appointments.isEmpty()) {
             System.out.println("No appointments to cancel.");
             return;
         }
 
         System.out.print("Appointment index: ");
-        int index = readInt(input);
+        int index = readInt(ctx.input);
 
-        if (!isValidIndex(index, appointments.size())) {
+        if (!isValidIndex(index, ctx.appointments.size())) {
             System.out.println(INVALID_INDEX_MESSAGE);
             return;
         }
 
-        Appointment appointment = appointments.get(index);
+        Appointment appointment = ctx.appointments.get(index);
 
-        freeSlotsForAppointment(appointment, allSlots);
+        freeSlotsForAppointment(appointment, ctx.allSlots);
         appointment.cancel();
-        appointments.remove(index);
+        ctx.appointments.remove(index);
 
-        notification.sendNotification(
+        ctx.notification.sendNotification(
                 appointment.getUser().getUsername() + EMAIL_DOMAIN,
                 "Your appointment has been cancelled"
         );
@@ -268,36 +215,31 @@ public class Main {
         System.out.println("✅ Cancelled + Email Sent");
     }
 
-    private static void adminModifyAppointment(
-            Scanner input,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            NotificationService notification
-    ) {
-        if (appointments.isEmpty()) {
+    private static void adminModifyAppointment(AppContext ctx) {
+        if (ctx.appointments.isEmpty()) {
             System.out.println("No appointments to modify.");
             return;
         }
 
         System.out.print("Appointment index: ");
-        int index = readInt(input);
+        int index = readInt(ctx.input);
 
-        if (!isValidIndex(index, appointments.size())) {
+        if (!isValidIndex(index, ctx.appointments.size())) {
             System.out.println(INVALID_INDEX_MESSAGE);
             return;
         }
 
-        Appointment oldAppointment = appointments.get(index);
-        Appointment newAppointment = createModifiedAppointment(input, allSlots, oldAppointment, bookingService);
+        Appointment oldAppointment = ctx.appointments.get(index);
+        Appointment newAppointment =
+                createModifiedAppointment(ctx.input, ctx.allSlots, oldAppointment, ctx.bookingService);
 
         if (newAppointment == null) {
             return;
         }
 
-        appointments.set(index, newAppointment);
+        ctx.appointments.set(index, newAppointment);
 
-        notification.sendNotification(
+        ctx.notification.sendNotification(
                 newAppointment.getUser().getUsername() + EMAIL_DOMAIN,
                 "Your appointment has been updated to: "
                         + newAppointment.getStart().format(DATE_TIME_FORMAT)
@@ -450,63 +392,47 @@ public class Main {
         System.out.println("✅ Reminders sent to " + sentCount + " users.");
     }
 
-    private static void handleUserLogin(
-            Scanner input,
-            List<User> users,
-            Schedule schedule,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            ReminderService reminderService
-    ) {
+    private static void handleUserLogin(AppContext ctx) {
         System.out.println("Choose user:");
-        for (int i = 0; i < users.size(); i++) {
-            System.out.println(i + " - " + users.get(i).getUsername());
+        for (int i = 0; i < ctx.users.size(); i++) {
+            System.out.println(i + " - " + ctx.users.get(i).getUsername());
         }
 
-        int index = readInt(input);
+        int index = readInt(ctx.input);
 
-        if (!isValidIndex(index, users.size())) {
+        if (!isValidIndex(index, ctx.users.size())) {
             System.out.println("❌ Invalid user index");
             return;
         }
 
-        User user = users.get(index);
+        User user = ctx.users.get(index);
 
         System.out.print("Password: ");
-        if (!user.getPassword().equals(input.next())) {
+        if (!user.getPassword().equals(ctx.input.next())) {
             System.out.println("❌ Wrong password");
             return;
         }
 
-        handleUserMenu(input, user, schedule, allSlots, appointments, bookingService, reminderService);
+        handleUserMenu(ctx, user);
     }
 
-    private static void handleUserMenu(
-            Scanner input,
-            User user,
-            Schedule schedule,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            ReminderService reminderService
-    ) {
+    private static void handleUserMenu(AppContext ctx, User user) {
         while (true) {
-            refreshData(schedule, allSlots, appointments);
+            refreshData(ctx.schedule, ctx.allSlots, ctx.appointments);
 
             printUserMenu();
-            int choice = readInt(input);
+            int choice = readInt(ctx.input);
 
             if (choice == 1) {
-                printCalendar(allSlots);
+                printCalendar(ctx.allSlots);
             } else if (choice == 2) {
-                bookAppointment(input, user, allSlots, appointments, bookingService, reminderService);
+                bookAppointment(ctx, user);
             } else if (choice == 3) {
-                userModifyAppointment(input, user, allSlots, appointments, bookingService);
+                userModifyAppointment(ctx, user);
             } else if (choice == 4) {
-                userCancelAppointment(input, user, allSlots, appointments);
+                userCancelAppointment(ctx, user);
             } else if (choice == 5) {
-                viewUserAppointments(appointments, user);
+                viewUserAppointments(ctx.appointments, user);
             } else if (choice == 6) {
                 break;
             }
@@ -524,21 +450,14 @@ public class Main {
         System.out.print(CHOICE_PROMPT);
     }
 
-    private static void bookAppointment(
-            Scanner input,
-            User user,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService,
-            ReminderService reminderService
-    ) {
-        printCalendar(allSlots);
+    private static void bookAppointment(AppContext ctx, User user) {
+        printCalendar(ctx.allSlots);
 
         System.out.print("Start slot index: ");
-        int startIndex = readInt(input);
+        int startIndex = readInt(ctx.input);
 
         System.out.print("Duration in minutes (30/60/90/120): ");
-        int durationMinutes = readInt(input);
+        int durationMinutes = readInt(ctx.input);
 
         if (!isValidDuration(durationMinutes)) {
             System.out.println("❌ Invalid duration. Max is 120 minutes and it must be multiple of 30.");
@@ -546,7 +465,7 @@ public class Main {
         }
 
         List<TimeSlot> neededSlots =
-                getConsecutiveAvailableSlots(allSlots, startIndex, durationMinutes / 30);
+                getConsecutiveAvailableSlots(ctx.allSlots, startIndex, durationMinutes / 30);
 
         if (neededSlots == null) {
             System.out.println(NO_CONSECUTIVE_SLOTS_MESSAGE);
@@ -554,16 +473,16 @@ public class Main {
         }
 
         System.out.print("Participants: ");
-        int participants = readInt(input);
+        int participants = readInt(ctx.input);
 
-        AppointmentType type = chooseAppointmentType(input);
+        AppointmentType type = chooseAppointmentType(ctx.input);
         if (type == null) {
             return;
         }
 
         Appointment appointment = buildAppointmentFromSlots(neededSlots, user, participants, type);
 
-        boolean booked = bookingService.book(appointment);
+        boolean booked = ctx.bookingService.book(appointment);
 
         if (!booked) {
             System.out.println("❌ Booking failed بسبب مخالفة أحد الشروط");
@@ -571,9 +490,9 @@ public class Main {
         }
 
         markSlots(neededSlots, true);
-        appointments.add(appointment);
+        ctx.appointments.add(appointment);
 
-        reminderService.sendReminder(user.getUsername() + EMAIL_DOMAIN, appointment);
+        ctx.reminderService.sendReminder(user.getUsername() + EMAIL_DOMAIN, appointment);
 
         System.out.println("✅ Booked from "
                 + appointment.getStart().format(DATE_TIME_FORMAT)
@@ -599,14 +518,8 @@ public class Main {
         return types[typeIndex];
     }
 
-    private static void userModifyAppointment(
-            Scanner input,
-            User user,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments,
-            BookingService bookingService
-    ) {
-        List<Appointment> myAppointments = getUserAppointments(appointments, user);
+    private static void userModifyAppointment(AppContext ctx, User user) {
+        List<Appointment> myAppointments = getUserAppointments(ctx.appointments, user);
 
         if (myAppointments.isEmpty()) {
             System.out.println(NO_APPOINTMENTS_MESSAGE);
@@ -616,7 +529,7 @@ public class Main {
         printUserAppointmentList(myAppointments);
 
         System.out.print("Choose your appointment index: ");
-        int myIndex = readInt(input);
+        int myIndex = readInt(ctx.input);
 
         if (!isValidIndex(myIndex, myAppointments.size())) {
             System.out.println(INVALID_INDEX_MESSAGE);
@@ -624,25 +537,22 @@ public class Main {
         }
 
         Appointment oldAppointment = myAppointments.get(myIndex);
-        Appointment newAppointment = createModifiedAppointment(input, allSlots, oldAppointment, bookingService);
+
+        Appointment newAppointment =
+                createModifiedAppointment(ctx.input, ctx.allSlots, oldAppointment, ctx.bookingService);
 
         if (newAppointment == null) {
             return;
         }
 
-        int realIndex = appointments.indexOf(oldAppointment);
-        appointments.set(realIndex, newAppointment);
+        int realIndex = ctx.appointments.indexOf(oldAppointment);
+        ctx.appointments.set(realIndex, newAppointment);
 
         System.out.println("✅ Modified");
     }
 
-    private static void userCancelAppointment(
-            Scanner input,
-            User user,
-            List<TimeSlot> allSlots,
-            List<Appointment> appointments
-    ) {
-        List<Appointment> myAppointments = getUserAppointments(appointments, user);
+    private static void userCancelAppointment(AppContext ctx, User user) {
+        List<Appointment> myAppointments = getUserAppointments(ctx.appointments, user);
 
         if (myAppointments.isEmpty()) {
             System.out.println(NO_APPOINTMENTS_MESSAGE);
@@ -652,7 +562,7 @@ public class Main {
         printUserAppointmentList(myAppointments);
 
         System.out.print("Choose your appointment index: ");
-        int myIndex = readInt(input);
+        int myIndex = readInt(ctx.input);
 
         if (!isValidIndex(myIndex, myAppointments.size())) {
             System.out.println(INVALID_INDEX_MESSAGE);
@@ -661,9 +571,9 @@ public class Main {
 
         Appointment appointment = myAppointments.get(myIndex);
 
-        freeSlotsForAppointment(appointment, allSlots);
+        freeSlotsForAppointment(appointment, ctx.allSlots);
         appointment.cancel();
-        appointments.remove(appointment);
+        ctx.appointments.remove(appointment);
 
         System.out.println("✅ Cancelled");
     }
