@@ -17,6 +17,14 @@
       **/notification/EmailService.java,
       **/notification/EmailNotificationService.java
     </sonar.coverage.exclusions>
+
+    <sonar.cpd.exclusions>
+      **/presentation/Main.java
+    </sonar.cpd.exclusions>
+
+    <sonar.coverage.jacoco.xmlReportPaths>
+      target/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <dependencies>
