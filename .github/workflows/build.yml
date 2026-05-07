@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
@@ -34,12 +35,13 @@ jobs:
 
       - name: Build and test
         run: mvn -B verify
-		- name: SonarCloud Scan
-		  uses: SonarSource/sonarqube-scan-action@v5
-		  env:
-		    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-		  with:
-		    args: >
-		      -Dsonar.projectKey=Fawzia-AbuAsbah_Appointment-Scheduling-BF
-		      -Dsonar.organization=fawzia-abuasbah
-		      -Dsonar.host.url=https://sonarcloud.io
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=Fawzia-AbuAsbah_Appointment-Scheduling-BF
+            -Dsonar.organization=fawzia-abuasbah
+            -Dsonar.host.url=https://sonarcloud.io
