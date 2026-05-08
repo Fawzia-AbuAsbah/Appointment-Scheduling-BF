@@ -15,7 +15,8 @@
     <sonar.coverage.exclusions>
       **/presentation/**,
       **/notification/EmailService.java,
-      **/notification/EmailNotificationService.java
+      **/notification/EmailNotificationService.java,
+        **/exception/EmailSendingException.java
     </sonar.coverage.exclusions>
 
     <sonar.cpd.exclusions>
