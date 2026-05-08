@@ -1,10 +1,17 @@
 package com.appointment.notification;
 
+import com.appointment.exception.EmailSendingException;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EmailService {
+
+    private static final Logger LOGGER =
+            Logger.getLogger(EmailService.class.getName());
 
     private final String username;
     private final String password;
@@ -43,13 +50,11 @@ public class EmailService {
 
             Transport.send(message);
 
-            System.out.println("Email sent successfully to " + to);
+            LOGGER.info("Email sent successfully to " + to);
 
         } catch (MessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send email", e);
+            LOGGER.log(Level.SEVERE, "Failed to send email", e);
+            throw new EmailSendingException("Failed to send email", e);
         }
     }
-
 }
-
